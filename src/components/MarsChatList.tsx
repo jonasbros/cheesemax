@@ -1,4 +1,3 @@
-import React from 'react'
 import Avatar from './Avatar'
 
 interface MarsInterface {
@@ -12,7 +11,7 @@ interface MarsInterface {
 }
 
 //components
-function MarsChatList({ marsList, onClick }: { marsList: any, onClick: Function }) {
+function MarsChatList({ marsList, onClick }: { marsList: any, onClick: Function }) {    
     return (
         <div className="w-full h-full rounded-md bg-blue-200 shadow-inner overflow-hidden">
             <ul>

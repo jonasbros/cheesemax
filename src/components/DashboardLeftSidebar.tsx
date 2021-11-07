@@ -1,62 +1,31 @@
-import React, { useState, useEffect } from 'react'
-import { firebase, firestore, auth } from './../firebase.config'
+import { firestore, auth } from './../firebase.config'
+import { useCollectionData } from 'react-firebase-hooks/firestore'
 
 import SearchMars from './SearchMars'
 import MarsChatList from './MarsChatList'
 
-interface MarsInterface {
-    authUID: string;
-    createdAt: string;
-    displayName: string;
-    email: string;
-    lastMessageTime: string;
-    photoURL: string;
-    uid: string;
-}
-
 
 function DashboardLeftSidebar({onClickMarsListItem}: {onClickMarsListItem: Function}) {
-    let [marsList, setMarsList] = useState<MarsInterface[]>([])
+    let marsListRef = firestore.collection("mars")
+        .orderBy("lastMessageTime", "asc")
+        .where('mars', 'array-contains', auth.currentUser!.uid)
 
-    useEffect(() => {
-        const getMarsChatList = async () => {
-            if( auth.currentUser ) {
-                let marsListRef = await firestore.collection("mars")
-                .orderBy("lastMessageTime", "desc")
-                .where("authUID", "==", auth.currentUser.uid)
-                .get()
-    
-                // marsRes.map() doesnt work hmmm
-                let marsListData: any = []
-                marsListRef.forEach((mars: any) => {
-                    marsListData.push({ uid: mars.id ,...mars.data()})
-                })
+    let [marsList] = useCollectionData(marsListRef, {idField: 'id'})
+    let formattedMarsList: any = []
 
-                console.log(marsListData)
-                setMarsList(marsListData)
-            } 
-        }
+    if( marsList?.length ) {
+        formattedMarsList = marsList?.map((mars, i, list) => {
+            let marsUID = mars.mars.filter((uid: string) => uid != auth.currentUser!.uid)[0]
+            let marsInfo = list[i][marsUID]
 
-        getMarsChatList()
-    }, [])
-
-    function addMars(mars: any) {
-        if( auth.currentUser ) {
-            let { serverTimestamp } = firebase.firestore.FieldValue
-            let newMars: MarsInterface = {
-                authUID: auth.currentUser.uid,
-                ...mars,
-                lastMessageTime: serverTimestamp()
-            }
-        
-            setMarsList([newMars, ...marsList])
-        }
+            return { uid: marsUID, displayName: marsInfo.displayName, email: marsInfo.email, photoURL: marsInfo.photoURL }
+        })
     }
 
     return (
-        <aside className="col-span-1 p-4 bg-blue-300 flex flex-col sticky h-full">
-            <SearchMars onAddMars={addMars} />
-            <MarsChatList marsList={marsList} onClick={(mars: any) => onClickMarsListItem(mars)} />
+        <aside className="col-span-1 p-4 bg-blue-300 flex flex-col sticky h-full max-h-full">
+            <SearchMars />
+            <MarsChatList marsList={formattedMarsList} onClick={(mars: any) => onClickMarsListItem(mars)} />
         </aside>
     )
 }

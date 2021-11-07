@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 import { firebase, firestore, auth } from './../firebase.config'
 import { useCollectionData } from 'react-firebase-hooks/firestore'
 
@@ -43,7 +43,7 @@ function ChatBox({ marsChat }: { marsChat: any }) {
             senderPhoto: auth.currentUser.photoURL,
             sendTime: serverTimestamp()
         }
-
+        console.log(msgObj)
         firestore.collection('messages').doc().set(msgObj)
         textareaVal.current.value = ''
     }

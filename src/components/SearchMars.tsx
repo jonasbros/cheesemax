@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import BaseInput from './BaseInput'
 import SearchMarsResults from './SearchMarsResults'
 
 import { firestore, auth } from './../firebase.config'
 
-
-function SearchMars({ onAddMars }: { onAddMars: any }) {
+function SearchMars() {
     let [showSearchMarsResults, setShowSearchMarsResults] = useState(false)
     let [marsResults, setMarsResults] = useState([])
 
@@ -27,7 +26,7 @@ function SearchMars({ onAddMars }: { onAddMars: any }) {
             setMarsResults(marsResData)
             setShowSearchMarsResults(showSearchMarsResults = true)
         }else {
-            setShowSearchMarsResults(showSearchMarsResults = false)
+            hideMarsResults()
         }
     }
 
@@ -35,12 +34,8 @@ function SearchMars({ onAddMars }: { onAddMars: any }) {
         setShowSearchMarsResults(showSearchMarsResults = false)
     }
 
-    function addMars(mars: any) {
-        if( mars && auth.currentUser ) {
-            onAddMars(mars)
-            setShowSearchMarsResults(showSearchMarsResults = false)
-        }
-        console.log(mars)
+    function onAddMarsHideResults() {
+        hideMarsResults()
     }
 
     return (
@@ -57,7 +52,7 @@ function SearchMars({ onAddMars }: { onAddMars: any }) {
                     label: 'Search Mars Email... '
                 }}
             />
-            {showSearchMarsResults && <SearchMarsResults marsResults={marsResults} addMarsState={addMars}/>}
+            {showSearchMarsResults && <SearchMarsResults marsResults={marsResults} onAddMars={onAddMarsHideResults}/>}
         </div>
     )
 }

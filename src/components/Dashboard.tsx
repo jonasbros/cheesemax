@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 //components
 import DashboardLeftSidebar from './DashboardLeftSidebar'
@@ -9,12 +9,8 @@ function Dashboard() {
     let [marsChat, setMarsChat] = useState(null)
 
     function showChat(mars: any) {
+        console.log(mars)
         setMarsChat(mars)
-        fetchMessages(mars)
-    }
-
-    async function fetchMessages(mars: any) {
-
     }
 
     return (
