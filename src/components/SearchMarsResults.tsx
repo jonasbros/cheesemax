@@ -1,13 +1,12 @@
-import React from 'react'
 import { firebase, firestore, auth } from './../firebase.config'
 
 import BaseBtn from './BaseBtn'
 import Avatar from './Avatar'
 
 
-function SearchMarsResults({ marsResults, addMarsState }: { marsResults: any, addMarsState: Function }) {
+function SearchMarsResults({ marsResults, onAddMars }: { marsResults: any, onAddMars: Function }) {
     function addMarsResult(mars: any) {
-        addMarsState(mars)
+        onAddMars()
         addMarsFirestore(mars)
     }
 
@@ -18,14 +17,23 @@ function SearchMarsResults({ marsResults, addMarsState }: { marsResults: any, ad
             let getGetUser = await getUser.get()
             let { serverTimestamp } = firebase.firestore.FieldValue
 
-
             let marsData = {
-                authUID: auth.currentUser.uid,
-                ...mars,
+                mars: [
+                    mars.uid,
+                    auth.currentUser.uid
+                ],
+                [auth.currentUser.uid]: { 
+                    displayName: auth.currentUser!.displayName, 
+                    photoURL: auth.currentUser!.photoURL, 
+                    email: auth.currentUser!.email 
+                },
+                [mars.uid]: { 
+                    displayName: mars.displayName,
+                    photoURL: mars.photoURL, 
+                    email: mars.email 
+                },
                 lastMessageTime: serverTimestamp()
             }
-
-            console.log(getGetUser)
 
             if( !getGetUser.exists ) {
                 getUser.set(marsData)               
