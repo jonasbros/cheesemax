@@ -12,16 +12,19 @@ function ChatBox({ marsChat }: { marsChat: any }) {
 
     let authUID = auth.currentUser ? auth.currentUser.uid : ''
 
+    let limit = 30
+
     let marsMsgs = firestore.collection("messages")
-        .orderBy("sendTime", "asc")
+        .orderBy("sendTime", "desc")
         .where('mars', 'in', [ 
             [authUID, marsChat.uid], [marsChat.uid, authUID] 
         ])
-        .limit(30)
+        .limit(limit)
+
     //get data real time and onload
-    let [messages] = useCollectionData(marsMsgs, {idField: 'id'})
-
-
+    // get descending order then reverse so we get last 30 items
+    let messages = useCollectionData(marsMsgs, {idField: 'id'})[0]?.reverse()
+    
     function onEnterSendMessage(e: any) {
         if( e.key !== 'Enter' ) return
         sendMessage()
